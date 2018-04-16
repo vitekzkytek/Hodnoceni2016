@@ -177,3 +177,8 @@ h2 {
 select::-ms-expand {
     display: none;
 }
+
+li.select2-results__option strong.select2-results__group:hover {
+  background-color: #ddd;
+  cursor: pointer;
+}

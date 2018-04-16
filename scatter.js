@@ -32,13 +32,19 @@ function DrawData(g,institutions,xScale,yScale,color,tooltip) {
         .data(points)
         .enter()
         .append('circle')
-        .attr('class','dot')
+        // .attr('class','dot')
         .attr('cx', function(d) {return xScale(d.LocalShare); })
         .attr('cy', function(d) {return yScale(d.PredatoryShare); })
         .attr('r', 5 )
         .attr('fill',function(d) {return color(d.Obor); })
         .attr('id',function(d) {return d.JEDNOTKA})
-        //.attr('class','selected') // Adjust selection here
+        .attr('class',function(d) {
+            if (document.getElementById('ddlSearch').value != '')
+            {
+                if (d.selected != 0) {return 'dot selected'; }
+                else {return 'dot unselected'; }
+            }
+        }) // Adjust selection here
         .attr('data-legend',function(d) {return d.Obor})
         .on('mouseover',function(d) {
             tooltip.transition()
@@ -176,47 +182,69 @@ function DrawLegend(institutions,g,xScale,yScale,color,tooltip) {
 
 function DrawChart(institutions) {
     $("#chart").empty();
+    $('.tooltip').empty();
 
     var margin = {top:10,right:20,bottom:30,left:60},
-        width = 530 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
+    width = 530 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
-        var xScale = d3.scaleLinear()
-            .range([0,width])
-            .domain([0,1]);
+    var xScale = d3.scaleLinear()
+        .range([0,width])
+        .domain([0,1]);
 
-        var xAxis = d3.axisBottom().scale(xScale).ticks(5).tickFormat(d3.format(".0%"));
+    var xAxis = d3.axisBottom().scale(xScale).ticks(5).tickFormat(d3.format(".0%"));
 
-        var yScale = d3.scaleLinear()
-    		.range([height,0])
-    		.domain([0,1]);
-        var yAxis = d3.axisLeft().scale(yScale).ticks(5).tickFormat(d3.format(".0%"));
+    var yScale = d3.scaleLinear()
+		.range([height,0])
+		.domain([0,1]);
+    var yAxis = d3.axisLeft().scale(yScale).ticks(5).tickFormat(d3.format(".0%"));
 
-        var color = d3.scaleOrdinal()
-        	.domain(['Zemědělské a veterinární vědy', 'Technické vědy', 'Humanitní vědy', 'Lékařské vědy','Přírodní vědy','Společenské vědy'])
-        	.range(['#d53e4f','#fc8d59','#fee08b','#e6f598','#99d594','#3288bd']);
 
-        var svg = d3.select('#chart')
-                    .append('svg')
-                    .attr('overflow','hidden')
-                    .attr('id','svg')
-                    .attr('width',width + margin.left + margin.right + 'px')
-                    .attr('height',height + margin.bottom + margin.top + 'px')
-                    .append('g')
-                    .attr('transform','translate(' + margin.left + ',' + margin.top + ')');
+    var color = d3.scaleOrdinal()
+    	.domain(['Zemědělské a veterinární vědy', 'Technické vědy', 'Humanitní vědy', 'Lékařské vědy','Přírodní vědy','Společenské vědy'])
+    	.range(['#d53e4f','#fc8d59','#fee08b','#e6f598','#99d594','#3288bd']);
 
-        var g = svg.append('g')
-                    .attr('id','chartGroup');
+    // var zoomBeh = d3.zoom()
+    //     .x(xScale)
+    //     .y(yScale)
+    //     .scaleExtent([0, 500])
+    //     .on("zoom", zoom);
 
-        d3.select('.tooltip').empty()
-        var tooltip = d3.select('body')
-                        .append('div')
-                        .attr('class','tooltip')
-                        .style('opacity',0);
+    var svg = d3.select('#chart')
+                .append('svg')
+                .attr('overflow','hidden')
+                .attr('id','svg')
+                .attr('width',width + margin.left + margin.right + 'px')
+                .attr('height',height + margin.bottom + margin.top + 'px')
+                .append('g')
+                .attr('transform','translate(' + margin.left + ',' + margin.top + ')');
+                // .call(zoomBeh);
 
-        DrawStatics(g,yAxis,xAxis,xScale,yScale,height,width);
+    var g = svg.append('g')
+                .attr('id','chartGroup');
 
-        DrawData(g,institutions,xScale,yScale,color,tooltip);
 
-        DrawLegend(institutions,g,xScale,yScale,color,tooltip);
+    // function zoom() {
+    //   svg.select(".x.axis").call(xAxis);
+    //   svg.select(".y.axis").call(yAxis);
+    //
+    //   svg.selectAll(".dot")
+    //       .attr("transform", transform);
+    // }
+
+    // function transform(d) {
+    //   return "translate(" + xScale(d.LocalShare) + "," + yScale(d.PredatoryShare) + ")";
+    // }
+
+
+    var tooltip = d3.select('body')
+                    .append('div')
+                    .attr('class','tooltip')
+                    .style('opacity',0);
+
+    DrawStatics(g,yAxis,xAxis,xScale,yScale,height,width);
+
+    DrawData(g,institutions,xScale,yScale,color,tooltip);
+
+    DrawLegend(institutions,g,xScale,yScale,color,tooltip);
 };

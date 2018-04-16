@@ -5,78 +5,23 @@
 		<title>Institucionální hodnocení dle IDEA</title>
 		<script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js" ></script>
 		<script type="text/javascript" src="https://d3js.org/d3.v4.min.js" ></script>
-		<script type="text/javascript" src="institutions.js"></script>
-		<script type="text/javascript" src="ddl.js"></script>
-		<script type="text/javascript" src="scatter.js"></script>
-		<link rel="stylesheet" type="text/css" href="css.css"></link>
-
 		<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+		<script type="text/javascript" src="institutions.js"></script>
+		<script type="text/javascript" src="ddldata.js"></script>
+		<script type="text/javascript" src="scatter.js"></script>
+		<link rel="stylesheet" type="text/css" href="css.css"></link>
 		<script type="text/javascript">
-            $(document).ready(function() {
-              $("#ddlSearch").select2({
-				  placeholder:"Vyberte instituci ...",
-				  allowClear:true,
-				  multiple:true,
-				  data:menudata,
-				  templateResult: function(item) {
-					if(typeof item.children != 'undefined') {
-
-						var s = $(item.element).find('option').length - $(item.element).find('option:selected').length;
-						// My optgroup element
-						var el = $('<span class="my_select2_optgroup'+(s ? '' : ' my_select2_optgroup_selected')+'">'+item.text+'</span>');
-
-						// Click event
-						el.click(function() {
-						// Select all optgroup child if there aren't, else deselect all
-						$('#my-select').find('optgroup[label="' + $(this).text() + '"] option').prop(
-							'selected',
-							$(item.element).find('option').length - $(item.element).find('option:selected').length
-						);
-						// Trigger change event + close dropdown
-						$('#my-select').change();
-						$('#my-select').select2('close');
-						});
-
-						// Hover events to properly manage display
-						el.mouseover(function() {
-						$('li.select2-results__option--highlighted').removeClass('select2-results__option--highlighted');
-						});
-						el.hover(function() {
-						el.addClass('my_select2_optgroup_hovered');
-						}, function() {
-						el.removeClass('my_select2_optgroup_hovered');
-						});
-						return el;
-					}
-					return item.text;
-					}
-
-			  });
-			  // $.each(institutions,function(key, value)
-			  // 	{
-			  // 	    $('#ddlSearch').append('<option value=' + key + '>' + value.JournalName + '</option>');
-			  // 	});
-            });
 
         </script>
-
-
-		<script type="text/javascript">
-
-
-	</script>
 	</head>
 	<body onload="DrawChart(institutions)">
 	<h2> </h2>
 	<h2>Institucionální hodnocení dle IDEA</h2>
 	<img src="IDEA.png" id="logo"></img>
 <div class="controls">
-
-		<select id='ddlSearch' class="searchbox" onchange="findJournal()">
-			<!-- <option value="0">... hledat časopis</option> -->
-		</select>
-<a class=button onclick="UpdateZoom()" id="btnZoom">Přiblížit III.</a>
+	<select id="ddlSearch" name="country[]" class="form-control" multiple style="width: 100%" onchange="ddlChange()"></select>
+	<script type="text/javascript" src="ddlControl.js"></script>
 
 	 </div>
 
