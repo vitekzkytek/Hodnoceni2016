@@ -5,6 +5,10 @@ var xAxisLabel = 'Podíl výsledků v RIV publikovaných v místních časopisec
 var fields = ['Zemědělské a veterinární vědy', 'Technické vědy', 'Humanitní vědy', 'Lékařské vědy','Přírodní vědy','Společenské vědy']
 var usedfields = fields
 
+var margin,width,height;
+var xScale,xAxis,yScale,yAxis,color;
+var svg,g,circles,tooltip;
+
 function filterArray (institutions) {
      listinst = $.map(institutions,function(el) {return el;});
      if (usedfields.length != fields.length) {
@@ -20,15 +24,17 @@ function toggleLegendClick(field,g,institutions,xScale,yScale,color,tooltip){
     else {
         usedfields.push(field)
     }
-    DrawData(g,institutions,xScale,yScale,color,tooltip);
+    DrawData();
 }
 
-function DrawData(g,institutions,xScale,yScale,color,tooltip) {
+function DrawData(selectedPoints=null) {
 
     var points = filterArray(institutions)
 
-    g.selectAll(".dot").remove();
-    g.selectAll('.dot')
+      $('#circles').empty();
+    //circles.selectAll("circle").remove();
+
+    d3.select('#circles').selectAll('.dot')
         .data(points)
         .enter()
         .append('circle')
@@ -44,14 +50,23 @@ function DrawData(g,institutions,xScale,yScale,color,tooltip) {
                 if (d.selected != 0) {return 'dot selected'; }
                 else {return 'dot unselected'; }
             }
+            // else {
+              if (selectedPoints != null) {
+                for  (i=0; i < points.length; i++ ) {
+                  if (selectedPoints[i].ID == d.ID) {return 'dot selected';}
+                  else {return 'dot unselected'; }
+                }
+              }
+            // }
         }) // Adjust selection here
         .attr('data-legend',function(d) {return d.Obor})
+        d3.selectAll('#circles circle')
         .on('mouseover',function(d) {
             tooltip.transition()
                 .duration(200)
                 .style('opacity',0.9);
-            tooltip.html(d.JEDNOTKA)
-        })
+            tooltip.html(d.JEDNOTKA);
+        }) //TODO tooltip does not work when some points selected
         .on('mouseout',function(d){
             tooltip.transition()
                 .duration(500)
@@ -62,9 +77,14 @@ function DrawData(g,institutions,xScale,yScale,color,tooltip) {
                 .style('left',(d3.event.pageX) + 'px')
                 .style('top',(d3.event.pageY - 28) + 'px')
         })
+        .on("click", function(d) {
+          SelectSinglePoint(d);
+          openDescBox(d);
+        });
+
 };
 
-function DrawStatics(g,yAxis,xAxis,xScale,yScale,height,width) {
+function DrawStatics() {
     // Draw y-axis
     g.append('g')
         .attr("class", "y axis")
@@ -136,7 +156,7 @@ function DrawStatics(g,yAxis,xAxis,xScale,yScale,height,width) {
         .attr('points',xScale(1) + ',' +yScale(0) + ' ' + xScale(1) + ',' +yScale(1) + ' ' + xScale(0) + ',' +yScale(1))
 };
 
-function DrawLegend(institutions,g,xScale,yScale,color,tooltip) {
+function DrawLegend() {
     var legendG = g.append('g')
                     .attr('class','legendG')
                     .attr('transform','translate(230,35)')
@@ -180,27 +200,27 @@ function DrawLegend(institutions,g,xScale,yScale,color,tooltip) {
         .text(function(d) {return d})
 };
 
-function DrawChart(institutions) {
+function DrawChart() {
     $("#chart").empty();
     $('.tooltip').empty();
 
-    var margin = {top:10,right:20,bottom:30,left:60},
+    margin = {top:10,right:20,bottom:30,left:60},
     width = 530 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
-    var xScale = d3.scaleLinear()
+    xScale = d3.scaleLinear()
         .range([0,width])
         .domain([0,1]);
 
-    var xAxis = d3.axisBottom().scale(xScale).ticks(5).tickFormat(d3.format(".0%"));
+    xAxis = d3.axisBottom().scale(xScale).ticks(5).tickFormat(d3.format(".0%"));
 
-    var yScale = d3.scaleLinear()
+    yScale = d3.scaleLinear()
 		.range([height,0])
 		.domain([0,1]);
-    var yAxis = d3.axisLeft().scale(yScale).ticks(5).tickFormat(d3.format(".0%"));
+    yAxis = d3.axisLeft().scale(yScale).ticks(5).tickFormat(d3.format(".0%"));
 
 
-    var color = d3.scaleOrdinal()
+    color = d3.scaleOrdinal()
     	.domain(['Zemědělské a veterinární vědy', 'Technické vědy', 'Humanitní vědy', 'Lékařské vědy','Přírodní vědy','Společenské vědy'])
     	.range(['#d53e4f','#fc8d59','#fee08b','#e6f598','#99d594','#3288bd']);
 
@@ -210,7 +230,7 @@ function DrawChart(institutions) {
     //     .scaleExtent([0, 500])
     //     .on("zoom", zoom);
 
-    var svg = d3.select('#chart')
+    svg = d3.select('#chart')
                 .append('svg')
                 .attr('overflow','hidden')
                 .attr('id','svg')
@@ -220,9 +240,10 @@ function DrawChart(institutions) {
                 .attr('transform','translate(' + margin.left + ',' + margin.top + ')');
                 // .call(zoomBeh);
 
-    var g = svg.append('g')
+    g = svg.append('g')
                 .attr('id','chartGroup');
-
+    circles = g.append('g')
+                .attr('id','circles');
 
     // function zoom() {
     //   svg.select(".x.axis").call(xAxis);
@@ -237,14 +258,14 @@ function DrawChart(institutions) {
     // }
 
 
-    var tooltip = d3.select('body')
+    tooltip = d3.select('body')
                     .append('div')
                     .attr('class','tooltip')
                     .style('opacity',0);
 
-    DrawStatics(g,yAxis,xAxis,xScale,yScale,height,width);
+    DrawStatics();
 
-    DrawData(g,institutions,xScale,yScale,color,tooltip);
+    DrawData();
 
-    DrawLegend(institutions,g,xScale,yScale,color,tooltip);
+    DrawLegend();
 };

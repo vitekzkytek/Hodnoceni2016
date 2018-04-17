@@ -15,13 +15,13 @@
 
         </script>
 	</head>
-	<body onload="DrawChart(institutions)">
+	<body onload="DrawChart()">
 	<h2> </h2>
 	<h2>Institucionální hodnocení dle IDEA</h2>
 	<img src="IDEA.png" id="logo"></img>
 <div class="controls">
 	<select id="ddlSearch" name="country[]" class="form-control" multiple style="width: 100%" onchange="ddlChange()"></select>
-	<script type="text/javascript" src="ddlControl.js"></script>
+	<script type="text/javascript" src="controls.js"></script>
 
 	 </div>
 
@@ -30,11 +30,11 @@
 	</div>
 	<div id="descBox" class="boxclosed">
 		<a id="closeDescLink"></a>
-		<span id="jTitle"></span>
-		<p id="jPublisher"></p>
-		<p id="jResults"></p>
-		<p id="jOtherDB"></p>
-	</div>
+		<span id="iJednotka"></span>
+		<p id="iPredkladatel"></p>
+		<p id="iResults"></p>
+		<p id='iExcel'></p>
+		</div>
 
 	</body>
 
