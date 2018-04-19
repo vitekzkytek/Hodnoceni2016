@@ -57,6 +57,9 @@ $('#ddlSearch').on('select2:open', function(e) {
 
 function ddlChange() {
     //unselect all
+    //TODO pri smazani ze searche se nezavira descBox
+    // je to tim, ze v probiha nekolika nasobne volani ddlChange
+    // a vj ednu chvili je proste lSelected.length == 1
     $.each(institutions,function(key,value)
             {
                 value.selected = 0;
@@ -64,24 +67,28 @@ function ddlChange() {
 
 
     var lSelected = $('#ddlSearch').select2('val');
-    var i;
+    console.log(lSelected.length)
     for (i=0; i < lSelected.length; i++) {
-        singleID = lSelected[i]
-
-        var obj = institutions[singleID];
-        delete institutions[singleID];
-        institutions[singleID] = obj;
-
-        institutions[singleID].selected = 1;
+        institutions[lSelected[i]].selected = 1;
     }
+    $("#ddlSearch").on("select2:unselecting", function (e) {
+        console.log('cleared');
+    });
+
+
+
+    if (lSelected.length === 1) {
+      openDescBox(institutions[lSelected[0]])
+    }
+
     $('#circles').empty();
     $('.tooltip').remove();
     DrawData();
 
 }
 function openDescBox(d) {
-  $('#descBox').css('display','block');
-  $('#descBox').animate({height:'150px'},500, function() {
+    $('#descBox').css('display','block');
+    $('#descBox').animate({height:'150px'},500, function() {
     $('#iJednotka').html('<strong>' + d.Jednotka_name + '</strong>')
     $('#iPredkladatel').html('Předkladatel: ' +  d.Predkladatel_long);
     $('#iResults').html('V letech 2011 - 2015 instituce do RIV přihlásila celkem ' + d.Total + ' výsledků. <br> Z nich ' + d.Czech + ' vyšlo v místních a dalších ' + d.Predatory + ' v predátorských časopisech')
@@ -98,7 +105,7 @@ function closeDescBox()
 
 			$.each(institutions,function(key, value)
 					{
-					    value.selected = "0";
+					    value.selected = 0;
 					});
 
 			$("#circles").empty();

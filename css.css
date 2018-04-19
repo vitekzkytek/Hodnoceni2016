@@ -32,18 +32,28 @@ text .tick {fill: #D9D9D9; }
 	text-anchor: middle;
 }
 
+.dot {
+  z-index: 98;
+}
+.circleText {
+  fill:#D1D4D3;
+  font-size: 12px;
+}
+
 div.tooltip {
   position: absolute;
   text-align: center;
 /*   width: 200px;
   height: 60px;    */
   padding: 2px;
-  font: 12px sans-serif;
+  font:12px sans-serif;
+  color: #bb133e;
   background: #D1D4D3;
   border: 0px;
   border-radius: 4px;
   pointer-events: none;
   padding:4px;
+  z-index: 99;
 }
 
 .helpline {

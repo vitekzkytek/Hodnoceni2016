@@ -204,47 +204,7 @@ function DrawChart() {
     $("#chart").empty();
     $('.tooltip').empty();
 
-    margin = {top:10,right:20,bottom:30,left:60},
-    width = 530 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
-
-    xScale = d3.scaleLinear()
-        .range([0,width])
-        .domain([0,1]);
-
-    xAxis = d3.axisBottom().scale(xScale).ticks(5).tickFormat(d3.format(".0%"));
-
-    yScale = d3.scaleLinear()
-		.range([height,0])
-		.domain([0,1]);
-    yAxis = d3.axisLeft().scale(yScale).ticks(5).tickFormat(d3.format(".0%"));
-
-
-    color = d3.scaleOrdinal()
-    	.domain(['Zemědělské a veterinární vědy', 'Technické vědy', 'Humanitní vědy', 'Lékařské vědy','Přírodní vědy','Společenské vědy'])
-    	.range(['#d53e4f','#fc8d59','#fee08b','#e6f598','#99d594','#3288bd']);
-
-    // var zoomBeh = d3.zoom()
-    //     .x(xScale)
-    //     .y(yScale)
-    //     .scaleExtent([0, 500])
-    //     .on("zoom", zoom);
-
-    svg = d3.select('#chart')
-                .append('svg')
-                .attr('overflow','hidden')
-                .attr('id','svg')
-                .attr('width',width + margin.left + margin.right + 'px')
-                .attr('height',height + margin.bottom + margin.top + 'px')
-                .append('g')
-                .attr('transform','translate(' + margin.left + ',' + margin.top + ')');
-                // .call(zoomBeh);
-
-    g = svg.append('g')
-                .attr('id','chartGroup');
-    circles = g.append('g')
-                .attr('id','circles');
-
+    GenerateGlobals();
     // function zoom() {
     //   svg.select(".x.axis").call(xAxis);
     //   svg.select(".y.axis").call(yAxis);
@@ -257,7 +217,6 @@ function DrawChart() {
     //   return "translate(" + xScale(d.LocalShare) + "," + yScale(d.PredatoryShare) + ")";
     // }
 
-
     tooltip = d3.select('body')
                     .append('div')
                     .attr('class','tooltip')
@@ -265,7 +224,143 @@ function DrawChart() {
 
     DrawStatics();
 
+    circles = g.append('g')
+                .attr('id','circles');
+
     DrawData();
 
     DrawLegend();
 };
+function GenerateGlobals() {
+  margin = {top:10,right:20,bottom:30,left:60},
+  width = 530 - margin.left - margin.right,
+  height = 500 - margin.top - margin.bottom;
+
+  xScale = d3.scaleLinear()
+      .range([0,width])
+      .domain([0,1]);
+
+  xAxis = d3.axisBottom().scale(xScale).ticks(5).tickFormat(d3.format(".0%"));
+
+  yScale = d3.scaleLinear()
+  .range([height,0])
+  .domain([0,1]);
+  yAxis = d3.axisLeft().scale(yScale).ticks(5).tickFormat(d3.format(".0%"));
+
+
+  color = d3.scaleOrdinal()
+    .domain(['Zemědělské a veterinární vědy', 'Technické vědy', 'Humanitní vědy', 'Lékařské vědy','Přírodní vědy','Společenské vědy'])
+    .range(['#d53e4f','#fc8d59','#fee08b','#e6f598','#99d594','#3288bd']);
+
+  // var zoomBeh = d3.zoom()
+  //     .x(xScale)
+  //     .y(yScale)
+  //     .scaleExtent([0, 500])
+  //     .on("zoom", zoom);
+
+  svg = d3.select('#chart')
+              .append('svg')
+              .attr('overflow','hidden')
+              .attr('id','svg')
+              .attr('width',width + margin.left + margin.right + 'px')
+              .attr('height',height + margin.bottom + margin.top + 'px')
+              .append('g')
+              .attr('transform','translate(' + margin.left + ',' + margin.top + ')');
+              // .call(zoomBeh);
+
+  g = svg.append('g')
+              .attr('id','chartGroup');
+
+}
+function DrawDescriptionChart() {
+  $("#chart").empty();
+  $('.tooltip').empty();
+  $('#circles').empty();
+
+  GenerateGlobals();
+  DrawStatics();
+  circles = g.append('g')
+              .attr('id','circles');
+
+
+  tooltip = d3.select('body')
+                  .append('div')
+                  .attr('class','tooltip')
+                  .style('opacity',0);
+
+  var data = [{PredatoryShare: 0,
+              LocalShare: 0,
+              Name:'A',
+              Label: 'Tato instituce nenahlásila žádný predátorský ani místní článek'},
+
+              {PredatoryShare: 1,
+              LocalShare: 0,
+              Name:'B',
+              Label: 'Všechny články jsou vydané v predátorských časopisech'},
+
+              {PredatoryShare: 0,
+              LocalShare: 1,
+              Name:'C',
+              Label: 'Všechny články jsou vydané v místních časopisech'},
+
+              {PredatoryShare: 0.5,
+              LocalShare: 0.5,
+              Name:'D',
+              Label: 'Polovina článků je vydána v místních a polovina v predátorských časopisech'},
+
+              {PredatoryShare: 0.2,
+              LocalShare: 0.6,
+              Name:'E',
+              Label: '60 % z výsledků v RIV je vydána v místních časopisech, 20 % v predátorských. <br> Dohromady v těchto časopisech vyšlo 80 % článků.'},
+              {PredatoryShare: 0.75,
+              LocalShare: 0.75,
+              Name:'F',
+              Label: 'Tato kombinace není možná, protože tato instituce by měla více <br> místních a predátorských článků, než má nahlášeno v RIV.<br>Součet je více než 100 %'}
+            ];
+
+          //circles.selectAll("circle").remove();
+
+      elems =  d3.select('#circles').selectAll('.dot')
+              .data(data)
+              .enter()
+              .append('g')
+              .attr('transform', function(d) {
+                    x = xScale(d.LocalShare).toString()
+                    y = yScale(d.PredatoryShare).toString()
+                    return  'translate(' + x + ','+ y + ')';
+                  })
+              // .attr('cy', function(d) {return yScale(d.PredatoryShare); })
+              .attr('id', function(d) {return d.Name});
+              // .attr('class','dot')
+              elems.append('circle')
+              .attr('r', 10 )
+              .attr('fill','#BB133E')
+              .attr('id',function(d) {return d.Name})
+              .attr('class','dot') // Adjust selection here
+
+              elems.append('text')
+              .attr('transform','translate(0,5)')
+              .attr('class','circleText')
+              .attr('text-anchor','middle')
+              .text(function(d) {return d.Name;});
+
+              d3.selectAll('#circles circle,text')
+              .on('mouseover',function(d) {
+                  tooltip.transition()
+                      .duration(200)
+                      .style('opacity',0.9);
+                  tooltip.html(d.Label);
+              })
+              .on('mouseout',function(d){
+                  tooltip.transition()
+                      .duration(500)
+                      .style('opacity',0);
+              })
+              .on('mousemove',function (d) {
+                  tooltip.html(d.Label)
+                      .style('left',(d3.event.pageX) + 'px')
+                      .style('top',(d3.event.pageY - 28) + 'px')
+              });
+
+
+}
