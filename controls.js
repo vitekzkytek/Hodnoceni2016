@@ -72,6 +72,7 @@ function ddlChange() {
         institutions[lSelected[i]].selected = 1;
     }
     $("#ddlSearch").on("select2:unselecting", function (e) {
+        $('#ddlSearch').val('');
         console.log('cleared');
     });
 
@@ -82,7 +83,13 @@ function ddlChange() {
     }
 
     $('#circles').empty();
-    $('.tooltip').remove();
+    $('.tooltip').empty();
+
+    tooltip = d3.select('body')
+                    .append('div')
+                    .attr('class','tooltip')
+                    .style('opacity',0);
+
     DrawData();
 
 }
