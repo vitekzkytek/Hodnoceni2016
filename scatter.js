@@ -3,7 +3,10 @@ var yAxisLabel = 'Podíl výsledků v RIV publikovaných v predátorských časo
 var xAxisLabel = 'Podíl výsledků v RIV publikovaných v místních časopisech'
 
 var fields = ['Zemědělské a veterinární vědy', 'Technické vědy', 'Humanitní vědy', 'Lékařské vědy','Přírodní vědy','Společenské vědy']
-var usedfields = fields
+var usedfields = fields;
+
+var types = ['Akademie věd','Vysoká škola','Ostatní']
+var usedtypes = types;
 
 var margin,width,height;
 var xScale,xAxis,yScale,yAxis,color;
@@ -14,10 +17,13 @@ function filterArray (institutions) {
      if (usedfields.length != fields.length) {
         listinst = listinst.filter(inst => usedfields.includes(inst.Obor))
     }
+    if (usedtypes.length != types.length) {
+       listinst = listinst.filter(inst => usedtypes.includes(inst.Type))
+    }
     return listinst;
 };
 
-function toggleLegendClick(field,g,institutions,xScale,yScale,color,tooltip){
+function toggleLegendFieldClick(field){
     if (usedfields.includes(field)) {
         usedfields = usedfields.filter(e => e != field);
     }
@@ -26,6 +32,19 @@ function toggleLegendClick(field,g,institutions,xScale,yScale,color,tooltip){
     }
     DrawData();
 }
+
+function toggleLegendTypeClick(type){
+    if (usedtypes.includes(type)) {
+        usedtypes = usedtypes.filter(e => e != type);
+    }
+    else {
+        usedtypes.push(type)
+    }
+    DrawData();
+}
+
+
+
 
 function DrawData(selectedPoints=null) {
 
@@ -42,7 +61,7 @@ function DrawData(selectedPoints=null) {
         .attr('cx', function(d) {return xScale(d.LocalShare); })
         .attr('cy', function(d) {return yScale(d.PredatoryShare); })
         .attr('r', function(d) {
-                if (d.selected != 0){ return '15px'}
+                if (d.selected != 0){ return '13px'}
             else {return '5px'} } )
         .attr('fill',function(d) {return color(d.Obor); })
         .attr('id',function(d) {return d.JEDNOTKA})
@@ -196,10 +215,10 @@ function DrawStatics() {
         .attr('points',xScale(1) + ',' +yScale(0) + ' ' + xScale(1) + ',' +yScale(1) + ' ' + xScale(0) + ',' +yScale(1))
 };
 
-function DrawLegend() {
+function DrawFieldLegend() {
     var legendG = g.append('g')
                     .attr('class','legendG')
-                    .attr('transform','translate(230,35)')
+                    .attr('transform','translate(250,25)')
     var legendRect = legendG.append('rect')
                         .attr('class','legendRect')
                         .attr('fill','white')
@@ -208,7 +227,7 @@ function DrawLegend() {
                         .attr('transform','translate(-15,-15)')
                         .attr('fill-opacity','0.6');
     legendG.append('text')
-            .text('Zobrazit/skrýt obory:')
+            .text('Zobrazit/skrýt:')
             .attr('id','legendDesc')
             .attr('transform','translate(0,2)')
 
@@ -219,7 +238,7 @@ function DrawLegend() {
                     .attr('class','legend')
                     .attr('transform',function(d,i) {return 'translate(0,'+ (20 + i*20) + ')'; })
                     .on('click',function(d) {
-                        toggleLegendClick(d,g,institutions,xScale,yScale,color,tooltip);
+                        toggleLegendFieldClick(d);
                         $(this).toggleClass('legendPassive');
                     });
 
@@ -238,6 +257,42 @@ function DrawLegend() {
         .attr('dy','.35em')
         .style('text-anchor','begin')
         .text(function(d) {return d})
+};
+
+
+function DrawTypeLegend(){
+    var legendG = g.append('g')
+                    .attr('class','legendG')
+                    .attr('transform','translate(250,183)');
+
+    var legendRect = legendG.append('rect')
+                        .attr('class','legendRect')
+                        .attr('fill','white')
+                        .attr('width','205px')
+                        .attr('height','70px')
+                        .attr('transform','translate(-15,-15)')
+                        .attr('fill-opacity','0.6');
+    // legendG.append('text')
+    //                 .text('Zobrazit/skrýt:')
+    //                 .attr('id','legendDesc')
+    //                 .attr('transform','translate(0,2)')
+    var legend = legendG.selectAll('.legend')
+                    .data(types)
+                    .enter()
+                    .append('g')
+                    .attr('class','legend')
+                    .attr('transform',function(d,i) {return 'translate(0,'+ (i*20) + ')'; })
+                    .on('click',function(d) {
+                        toggleLegendTypeClick(d);
+                        $(this).toggleClass('legendPassive');
+                    });
+                    legend.append('text')
+                        .attr('x',15)
+                        .attr('dy','.35em')
+                        .style('text-anchor','begin')
+                        .text(function(d) {return d})
+
+
 };
 
 function DrawChart() {
@@ -269,7 +324,9 @@ function DrawChart() {
 
     DrawData();
 
-    DrawLegend();
+    DrawFieldLegend();
+
+    DrawTypeLegend();
 };
 function GenerateGlobals() {
   margin = {top:10,right:20,bottom:30,left:60},

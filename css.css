@@ -158,8 +158,8 @@ div.tooltip {
 }
 
 .selected {
-	/* stroke :red;
-	stroke-width: 15px; */
+	stroke:black;
+	stroke-width: 2px;
 }
 .unselected {
 	opacity: 0.2;
