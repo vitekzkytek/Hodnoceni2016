@@ -41,7 +41,9 @@ function DrawData(selectedPoints=null) {
         // .attr('class','dot')
         .attr('cx', function(d) {return xScale(d.LocalShare); })
         .attr('cy', function(d) {return yScale(d.PredatoryShare); })
-        .attr('r', 5 )
+        .attr('r', function(d) {
+                if (d.selected != 0){ return '15px'}
+            else {return '5px'} } )
         .attr('fill',function(d) {return color(d.Obor); })
         .attr('id',function(d) {return d.JEDNOTKA})
         .attr('class',function(d) {
@@ -117,6 +119,13 @@ function DrawStatics() {
         .attr('y2',yScale(1))
         .attr('class','helpline')
         .attr('stroke-dasharray',"5,5");
+        g.append('text')
+          .attr('transform','rotate(45 ' + xScale(0.06) + ',' + yScale(0.9) + ')')
+          .attr('x',xScale(0.06))
+          .attr('y',yScale(0.9))
+          .text('100 %')
+          .attr('class','lineDesc');
+
 
       g.append("line")
         .attr("x1",xScale(0.8))
@@ -126,6 +135,13 @@ function DrawStatics() {
         .attr('class','helpline')
         .attr('stroke-dasharray',"5,5");
 
+      g.append('text')
+        .attr('transform','rotate(45 ' + xScale(0.06) + ',' + yScale(0.7) + ')')
+        .attr('x',xScale(0.06))
+        .attr('y',yScale(0.7))
+        .text('80 %')
+        .attr('class','lineDesc');
+
       g.append("line")
         .attr("x1",xScale(0.6))
         .attr('y1',yScale(0))
@@ -133,6 +149,14 @@ function DrawStatics() {
         .attr('y2',yScale(0.6))
         .attr('class','helpline')
         .attr('stroke-dasharray',"5,5");
+
+        g.append('text')
+          .attr('transform','rotate(45 ' + xScale(0.06) + ',' + yScale(0.5) + ')')
+          .attr('x',xScale(0.06))
+          .attr('y',yScale(0.5))
+          .text('60 %')
+          .attr('class','lineDesc');
+
 
       g.append("line")
         .attr("x1",xScale(0.4))
@@ -142,6 +166,14 @@ function DrawStatics() {
         .attr('class','helpline')
         .attr('stroke-dasharray',"5,5");
 
+        g.append('text')
+          .attr('transform','rotate(45 ' + xScale(0.06) + ',' + yScale(0.3) + ')')
+          .attr('x',xScale(0.06))
+          .attr('y',yScale(0.3))
+          .text('40 %')
+          .attr('class','lineDesc');
+
+
       g.append("line")
         .attr("x1",xScale(0.2))
         .attr('y1',yScale(0))
@@ -149,6 +181,14 @@ function DrawStatics() {
         .attr('y2',yScale(0.2))
         .attr('class','helpline')
         .attr('stroke-dasharray',"5,5");
+
+        g.append('text')
+          .attr('transform','rotate(45 ' + xScale(0.06) + ',' + yScale(0.1) + ')')
+          .attr('x',xScale(0.06))
+          .attr('y',yScale(0.1))
+          .text('20 %')
+          .attr('class','lineDesc');
+
 
         //triangle
         g.append('polygon')

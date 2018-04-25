@@ -60,6 +60,11 @@ div.tooltip {
 	stroke: #D9D9D9;
 	shape-rendering: crispEdges;
 }
+.lineDesc {
+    fill: #D9D9D9;
+	font-size: 10px;
+	text-anchor: middle;
+}
 
 .triangle {
     fill: #D9D9D9;
@@ -153,8 +158,8 @@ div.tooltip {
 }
 
 .selected {
-	stroke :red;
-	stroke-width: 15px;
+	/* stroke :red;
+	stroke-width: 15px; */
 }
 .unselected {
 	opacity: 0.2;
