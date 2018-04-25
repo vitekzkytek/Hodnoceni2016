@@ -5,7 +5,7 @@ var xAxisLabel = 'Podíl výsledků v RIV publikovaných v místních časopisec
 var fields = ['Zemědělské a veterinární vědy', 'Technické vědy', 'Humanitní vědy', 'Lékařské vědy','Přírodní vědy','Společenské vědy']
 var usedfields = fields;
 
-var types = ['Akademie věd','Vysoká škola','Ostatní']
+var types = ['Akademie věd','Vysoké školy','Ostatní']
 var usedtypes = types;
 
 var margin,width,height;
@@ -42,8 +42,6 @@ function toggleLegendTypeClick(type){
     }
     DrawData();
 }
-
-
 
 
 function DrawData(selectedPoints=null) {
@@ -292,6 +290,16 @@ function DrawTypeLegend(){
                         .style('text-anchor','begin')
                         .text(function(d) {return d})
 
+                    //Draw legend icons
+                    legend.append('svg:image')
+                        .attr('xLink:href',function(d) {return d + '.svg'})
+                        .attr('transform','translate(-7,-8)')
+                        // .attr('r',5)
+                        .attr('width',16)
+                        .attr('height',16);
+                        // .style('fill',color)
+                        // .style('stroke',color);
+
 
 };
 
@@ -367,8 +375,8 @@ function GenerateGlobals() {
 
   g = svg.append('g')
               .attr('id','chartGroup');
-
 }
+
 function DrawDescriptionChart() {
   $("#chart").empty();
   $('.tooltip').empty();
@@ -458,6 +466,4 @@ function DrawDescriptionChart() {
                       .style('left',(d3.event.pageX) + 'px')
                       .style('top',(d3.event.pageY - 28) + 'px')
               });
-
-
 }
