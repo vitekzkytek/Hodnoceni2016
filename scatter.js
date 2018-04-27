@@ -12,6 +12,10 @@ var margin,width,height;
 var xScale,xAxis,yScale,yAxis,color;
 var svg,g,circles,tooltip;
 
+var lIncluded = [];
+
+
+
 function filterArray (institutions) {
      listinst = $.map(institutions,function(el) {return el;});
      if (usedfields.length != fields.length) {
@@ -49,6 +53,12 @@ function DrawData(selectedPoints=null) {
     var points = filterArray(institutions)
 
       $('#circles').empty();
+      $('.tooltip').remove();
+      tooltip = d3.select('body')
+                      .append('div')
+                      .attr('class','tooltip')
+                      .style('opacity',0);
+
     //circles.selectAll("circle").remove();
 
     d3.select('#circles').selectAll('.dot')
@@ -59,7 +69,7 @@ function DrawData(selectedPoints=null) {
         .attr('cx', function(d) {return xScale(d.LocalShare); })
         .attr('cy', function(d) {return yScale(d.PredatoryShare); })
         .attr('r', function(d) {
-                if (d.selected != 0){ return '13px'}
+                if (d.selected != 0){ return '10px'}
             else {return '5px'} } )
         .attr('fill',function(d) {return color(d.Obor); })
         .attr('id',function(d) {return d.JEDNOTKA})
@@ -220,6 +230,8 @@ function DrawFieldLegend() {
     var legendRect = legendG.append('rect')
                         .attr('class','legendRect')
                         .attr('fill','white')
+                        .attr('rx',9)
+                        .attr('rx',9)
                         .attr('width','205px')
                         .attr('height','150px')
                         .attr('transform','translate(-15,-15)')
@@ -266,6 +278,8 @@ function DrawTypeLegend(){
     var legendRect = legendG.append('rect')
                         .attr('class','legendRect')
                         .attr('fill','white')
+                        .attr('rx',9)
+                        .attr('rx',9)
                         .attr('width','205px')
                         .attr('height','70px')
                         .attr('transform','translate(-15,-15)')
@@ -304,8 +318,9 @@ function DrawTypeLegend(){
 };
 
 function DrawChart() {
+    lIncluded = getIncludedIDs();
     $("#chart").empty();
-    $('.tooltip').empty();
+    // $('.tooltip').empty();
 
     GenerateGlobals();
     // function zoom() {
@@ -319,12 +334,12 @@ function DrawChart() {
     // function transform(d) {
     //   return "translate(" + xScale(d.LocalShare) + "," + yScale(d.PredatoryShare) + ")";
     // }
-
-    tooltip = d3.select('body')
-                    .append('div')
-                    .attr('class','tooltip')
-                    .style('opacity',0);
-
+    //
+    // tooltip = d3.select('body')
+    //                 .append('div')
+    //                 .attr('class','tooltip')
+    //                 .style('opacity',0);
+    //
     DrawStatics();
 
     circles = g.append('g')

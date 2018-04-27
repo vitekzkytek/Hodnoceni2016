@@ -126,8 +126,8 @@ div.tooltip {
     stroke-width:2px;
 }
 
-.legendPassive text{
-    opacity:0.5;
+.legendPassive {
+    opacity:0.3;
 }
 
 .legendPassive circle{

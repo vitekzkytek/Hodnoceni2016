@@ -1,7 +1,6 @@
 import pandas as pd
 import json
 
-
 ### DROPDOWNLIST MENU JSON
 # see https://select2.org/data-sources/formats
 data = pd.read_excel('Institutions_Final.xlsx',sheet_name='JEDNOTKA')
@@ -24,13 +23,12 @@ for predkl in data.Predkladatel_long.unique():
         d3 = {}
         d3['id'] = str(row.ID)
         d3['text'] = str(row.JEDNOTKA)
+        d3['included'] = str(row.Included)
         #d[predkl].append(inst)
         d2['children'].append(d3)
         i += 1
 
     l.append(d2)
-
-l
 
 with open('ddldata.js', 'w', encoding='utf-8') as f:
     f.write(s0 + str(json.dumps(l,ensure_ascii=False)))
@@ -41,7 +39,7 @@ with open('ddldata.js', 'w', encoding='utf-8') as f:
 
 ### lIST OF INSTITUTIONS FOR D3 SCATTER.JS SCRIPT
 data = pd.read_excel('Institutions_Final.xlsx',sheet_name='JEDNOTKA')
-
+data = data[data.Included == True]
 s0 = 'var institutions = '
 s = data.to_json(orient='index',force_ascii=False)
 

@@ -1,5 +1,21 @@
+function getIncludedIDs() {
+    result = [];
+
+    for (var org in menudata) {
+        for (var inst in menudata[org].children) {
+            if (menudata[org].children[inst].included === "True")
+            {result.push(menudata[org].children[inst].id)}
+        }
+    }
+
+
+    return result;
+}
+
+
 $('#ddlSearch').select2({
   placeholder: "Vyberte instituci",
+  //theme:'paper',
   allowClear: true,
   width: '520px',
   data: menudata
@@ -67,19 +83,28 @@ function ddlChange() {
 
 
     var lSelected = $('#ddlSearch').select2('val');
-    console.log(lSelected.length)
     for (i=0; i < lSelected.length; i++) {
-        institutions[lSelected[i]].selected = 1;
+        if (lIncluded.includes(lSelected[i])) {
+            institutions[lSelected[i]].selected = 1;
+        }
     }
     $("#ddlSearch").on("select2:unselecting", function (e) {
-        $('#ddlSearch').val('');
-        console.log('cleared');
+        location.reload(true);
+        //TODO vylepsi tohle
+//       $('#ddlSearch').val(null)
+// //TODO check if upper doesnt solve my problem????
+//         //$('#ddlSearch').val('');
     });
 
-
-
     if (lSelected.length === 1) {
-      openDescBox(institutions[lSelected[0]])
+
+        if (lIncluded.includes(lSelected[0])) {
+        d = institutions[lSelected[0]]
+            openDescBox(d)
+        }
+        else {
+            openDescBoxNA()
+        }
     }
 
     $('#circles').empty();
@@ -89,18 +114,29 @@ function ddlChange() {
                     .append('div')
                     .attr('class','tooltip')
                     .style('opacity',0);
-
     DrawData();
+};
 
-}
+function openDescBoxNA() {
+    $('#descBox').css('display','block');
+    $('#descBox').animate({height:'40px'},250, function() {
+        $('#iJednotka').html('Pro tuto instituci není k dispozici dostatečný počet výsledků a proto nebyla zařazena do analýzy.')
+         $('#iPredkladatel').html('');
+        $('#iResults').html('');
+        $('#iExcel').html('');
+        $('#closeDescLink').html('<a id="closeDescLink" href="#" onclick="closeDescBox(institutions);"><img src="CloseIcon.png" height="30" width="30"></img></a>')
+
+    })
+};
+
 function openDescBox(d) {
     $('#descBox').css('display','block');
     $('#descBox').animate({height:'150px'},500, function() {
-    $('#iJednotka').html('<strong>' + d.Jednotka_name + '</strong>')
-    $('#iPredkladatel').html('Předkladatel: ' +  d.Predkladatel_long);
-    $('#iResults').html('V letech 2011 - 2015 instituce do RIV přihlásila celkem ' + d.Total + ' výsledků. <br> Z nich ' + d.Czech + ' vyšlo v místních a dalších ' + d.Predatory + ' v predátorských časopisech')
-    $('#closeDescLink').html('<a id="closeDescLink" href="#" onclick="closeDescBox(institutions);"><img src="CloseIcon.png" height="30" width="30"></img></a>')
-    $('#iExcel').html('Seznam místních a predátorských výsledků je ke stažení <a href="xls/'+ d.JEDNOTKA +'.xlsx">zde</a>')
+        $('#iJednotka').html('<strong>' + d.Jednotka_name + '</strong>')
+        $('#iPredkladatel').html('Předkladatel: ' +  d.Predkladatel_long);
+        $('#iResults').html('V letech 2011 - 2015 instituce do RIV přihlásila celkem ' + d.Total + ' výsledků. <br> Z nich ' + d.Czech + ' vyšlo v místních a dalších ' + d.Predatory + ' v predátorských časopisech')
+        $('#closeDescLink').html('<a id="closeDescLink" href="#" onclick="closeDescBox(institutions);"><img src="CloseIcon.png" height="30" width="30"></img></a>')
+        $('#iExcel').html('Ke stažení je k dispozici seznam <a href="xls/'+ d.JEDNOTKA +'_Local.xlsx">místních</a>, <a href="xls/'+ d.JEDNOTKA +'_Predatory.xlsx">predátorských</a> a i <a href="xls/'+ d.JEDNOTKA +'_All.xlsx">všech</a> výsledků přihlášených do RIV.')
   })
 }
 
@@ -117,7 +153,7 @@ function closeDescBox()
 
 			$("#circles").empty();
 			$(".tooltip").remove();
-      $('#ddlSearch').val(null).change();
+            $('#ddlSearch').val(null).change();
 			DrawData();
 	});
 };
