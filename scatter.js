@@ -318,7 +318,8 @@ function DrawTypeLegend(){
 };
 
 function DrawChart() {
-    lIncluded = getIncludedIDs();
+    sortMenudata();
+    
     $("#chart").empty();
     // $('.tooltip').empty();
 

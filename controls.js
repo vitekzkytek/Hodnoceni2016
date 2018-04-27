@@ -1,128 +1,100 @@
-function getIncludedIDs() {
-    result = [];
+// function getIncludedIDs() {
+//     result = [];
+//
+//     for (var org in menudata) {
+//         for (var inst in menudata[org].children) {
+//             if (menudata[org].children[inst].included === "True")
+//             {result.push(menudata[org].children[inst].id)}
+//         }
+//     }
+//     return result;
+// }
 
+var orgs = [],insts = [], includedInsts = [];
+
+function sortMenudata() {
     for (var org in menudata) {
-        for (var inst in menudata[org].children) {
-            if (menudata[org].children[inst].included === "True")
-            {result.push(menudata[org].children[inst].id)}
-        }
+        o = menudata[org]
+         if (o.level === 0) {
+             orgs.push(o.id);
+         }
+         else {
+             insts.push(org)
+             if(o.included === "True") {
+                 includedInsts.push(o.id);
+             }
+         }
     }
-
-
-    return result;
 }
+
+function formatResult(node) {
+  var $result = $('<span style="padding-left:' + (20 * node.level) + 'px;">' + node.text + '</span>');
+  return $result;
+};
+
 
 
 $('#ddlSearch').select2({
-  placeholder: "Vyberte instituci",
+  // placeholder: "Vyberte instituci",
   //theme:'paper',
+  placeholder: {id:'',text: 'Vyberte instituci ...'},
   allowClear: true,
   width: '520px',
-  data: menudata
+  data: menudata,
+  formatSelection: function(item) {
+      return item.text
+  },
+  formatResult: function(item) {
+      return item.text
+  },
+    templateResult: formatResult
 });
-
-$('#ddlSearch').on('select2:open', function(e) {
-
-  $('#select2-ddlSearch-results').on('click', function(event) {
-
-    event.stopPropagation();
-    var data = $(event.target).html();
-    var selectedOptionGroup = data.toString().trim();
-    var groupchildren = [];
-
-    for (var i = 0; i < menudata.length; i++) {
-
-      if (selectedOptionGroup.toString() === menudata[i].text.toString()) {
-        for (var j = 0; j < menudata[i].children.length; j++) {
-          groupchildren.push(menudata[i].children[j].id);
-        }
-      }
-    }
-
-    var options = [];
-    options = $('#ddlSearch').val();
-    if (options === null || options === '') {
-      options = [];
-    }
-
-    for (var i = 0; i < groupchildren.length; i++) {
-      var count = 0;
-      for (var j = 0; j < options.length; j++) {
-        if (options[j].toString() === groupchildren[i].toString()) {
-          count++;
-          break;
-        }
-      }
-
-      if (count === 0) {
-        options.push(groupchildren[i].toString());
-      }
-    }
-
-    $('#ddlSearch').val(options);
-    $('#ddlSearch').trigger('change'); // Notify any JS components that the value changed
-    $('#ddlSearch').select2('close');
-
-    $('li.select2-selection__choice').remove()
-    $('ul.select2-selection__rendered').append('<li class="select2-selection__choice" title="' + data + '"><span class="select2-selection__choice__remove" role="presentation">×</span>'+data+'</li>')
-
-  });
-});
-
-
 
 function ddlChange() {
-    //unselect all
-    //TODO pri smazani ze searche se nezavira descBox
-    // je to tim, ze v probiha nekolika nasobne volani ddlChange
-    // a vj ednu chvili je proste lSelected.length == 1
-    $.each(institutions,function(key,value)
-            {
-                value.selected = 0;
-            })
+    var id  = $('#ddlSearch').select2('val');
+    unselectAll();
+    var anythingSelected = (id !== '') ? true : false;
 
+    if (anythingSelected) {
+        var IsOrg = (orgs.includes(id)) ? true : false;
 
-    var lSelected = $('#ddlSearch').select2('val');
-    for (i=0; i < lSelected.length; i++) {
-        if (lIncluded.includes(lSelected[i])) {
-            institutions[lSelected[i]].selected = 1;
+        if (IsOrg) {
+            listinst = $.map(institutions,function(el) {return el;});
+            ds = listinst.filter(d => d.Predkladatel_short === id);
+
+            $.each(ds,function(key,value)
+                {
+                    value.selected = 1
+                });
+        }
+         else {
+            if(includedInsts.includes(id)) {
+                d = institutions[id];
+                    d.selected = 1;
+                    openDescBox(d);
+                }
+                else {
+                    d = excludedInsts[id];
+                    openDescBoxNA(d);
+                }
         }
     }
-    $("#ddlSearch").on("select2:unselecting", function (e) {
-        location.reload(true);
-        //TODO vylepsi tohle
-//       $('#ddlSearch').val(null)
-// //TODO check if upper doesnt solve my problem????
-//         //$('#ddlSearch').val('');
-    });
-
-    if (lSelected.length === 1) {
-
-        if (lIncluded.includes(lSelected[0])) {
-        d = institutions[lSelected[0]]
-            openDescBox(d)
-        }
-        else {
-            openDescBoxNA()
-        }
-    }
-
-    $('#circles').empty();
-    $('.tooltip').empty();
-
-    tooltip = d3.select('body')
-                    .append('div')
-                    .attr('class','tooltip')
-                    .style('opacity',0);
     DrawData();
-};
+}
+function unselectAll() {
+    $.each(institutions,function(key,value)
+        {
+            value.selected = 0;
+        })
 
-function openDescBoxNA() {
+}
+
+function openDescBoxNA(d) {
     $('#descBox').css('display','block');
-    $('#descBox').animate({height:'40px'},250, function() {
-        $('#iJednotka').html('Pro tuto instituci není k dispozici dostatečný počet výsledků a proto nebyla zařazena do analýzy.')
-         $('#iPredkladatel').html('');
-        $('#iResults').html('');
+    $('#descBox').animate({height:'100px'},333, function() {
+        $('#iJednotka').html('<strong>' + d.Jednotka_name + '</strong>')
+        $('#iPredkladatel').html('Předkladatel: ' +  d.Predkladatel_long);
+        $('#iResults').html('Není k dispozici dostatečný počet relevantních výsledků a proto do analýzy nebyla zařazena.');
         $('#iExcel').html('');
         $('#closeDescLink').html('<a id="closeDescLink" href="#" onclick="closeDescBox(institutions);"><img src="CloseIcon.png" height="30" width="30"></img></a>')
 

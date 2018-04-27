@@ -1,0 +1,41 @@
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js" ></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+        <script type="text/javascript" src="ddldata.js"></script>
+        <script>
+            function formatResult(node) {
+              var $result = $('<span style="padding-left:' + (20 * node.level) + 'px;">' + node.text + '</span>');
+              return $result;
+            };
+        </script>
+    </head>
+
+    <body>
+        <div>
+        <select id="ddlSearch" class="form-control" multiple style="width: 100%" onchange="ddlChange()"></select>
+        <script>
+            $('#ddlSearch').select2({
+              placeholder: "Vyberte instituci",
+              //theme:'paper',
+              allowClear: true,
+              width: '520px',
+              data: menudata,
+              formatSelection: function(item) {
+                  return item.text
+              },
+              formatResult: function(item) {
+                  return item.text
+              },
+                templateResult: formatResult
+            });
+
+        </script>
+        </div>
+    </body>
+
+
+</html>
